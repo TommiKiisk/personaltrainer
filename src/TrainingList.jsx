@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 const TrainingList = () => {
   const [trainings, setTrainings] = useState([]);
   const [filter, setFilter] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   useEffect(() => {
     fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings")
@@ -28,6 +29,27 @@ const TrainingList = () => {
     }
   };
 
+  // Sorting Logic
+  const sortData = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+
+    const sortedData = [...trainings].sort((a, b) => {
+      if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
+      if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
+      return 0;
+    });
+    setTrainings(sortedData);
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === "ascending" ? " ▲" : " ▼";
+  };
+
   const filteredTrainings = trainings.filter(
     (training) =>
       training.activity.toLowerCase().includes(filter.toLowerCase()) ||
@@ -51,9 +73,9 @@ const TrainingList = () => {
       <table border="1" cellPadding="5" style={{ width: "100%", marginTop: "10px" }}>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Duration (minutes)</th>
-            <th>Activity</th>
+            <th onClick={() => sortData("date")}>Date {getSortIndicator("date")}</th>
+            <th onClick={() => sortData("duration")}>Duration (minutes) {getSortIndicator("duration")}</th>
+            <th onClick={() => sortData("activity")}>Activity {getSortIndicator("activity")}</th>
             <th>Actions</th>
           </tr>
         </thead>
