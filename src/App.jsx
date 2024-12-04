@@ -5,6 +5,7 @@ import AddCustomer from "./AddCustomer";
 import TrainingList from "./TrainingList";
 import AddTraining from "./AddTraining";
 import TrainingCalendar from "./TrainCalendar";
+import TrainingData from "./StatsPage";
 
 
 function App() {
@@ -27,6 +28,9 @@ function App() {
           <Link to="/calendar" style={{ textDecoration: "none", color: "blue"}}>
             Training Calendar
           </Link>
+          <Link to="/TrainingData" style={{ textDecoration: "none", color: "blue"}}>
+            Training Data
+          </Link>
         </nav>
 
         <Routes>
@@ -35,6 +39,7 @@ function App() {
           <Route path="/trainings" element={<TrainingList />} />
           <Route path="/add-training" element={<AddTraining />} />
           <Route path="/calendar" element={<TrainingCalendar />} />
+          <Route path="/TrainingData" element={<TrainingData />} />
         </Routes>
       </div>
     </Router>
