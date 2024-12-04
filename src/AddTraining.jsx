@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import DatePicker styles
 
 const AddTraining = () => {
   const [formData, setFormData] = useState({
-    date: "",
+    date: null, // Changed to Date object for DatePicker
     activity: "",
     duration: "",
     customer: "",
@@ -11,7 +13,9 @@ const AddTraining = () => {
 
   useEffect(() => {
     // Fetch customers to populate the dropdown
-    fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers")
+    fetch(
+      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers"
+    )
       .then((response) => response.json())
       .then((data) => {
         setCustomers(data._embedded.customers);
@@ -23,17 +27,35 @@ const AddTraining = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, date });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
+    const formattedData = {
+      ...formData,
+      date: formData.date.toISOString(), // Convert Date object to ISO string
+    };
+
+    fetch(
+      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+      }
+    )
       .then((response) => {
         if (response.ok) {
           alert("Training session added successfully!");
+          setFormData({
+            date: null,
+            activity: "",
+            duration: "",
+            customer: "",
+          });
         } else {
           alert("Failed to add training session.");
         }
@@ -44,15 +66,22 @@ const AddTraining = () => {
   return (
     <div>
       <h2>Add Training</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input
-          name="date"
-          type="datetime-local"
-          placeholder="Date"
-          value={formData.date}
-          onChange={handleChange}
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
+        {/* Date Input */}
+        <DatePicker
+          selected={formData.date}
+          onChange={handleDateChange}
+          showTimeSelect
+          dateFormat="Pp"
+          placeholderText="Select Date and Time"
           required
+          style={{ padding: "10px" }}
         />
+
+        {/* Activity Input */}
         <input
           name="activity"
           placeholder="Activity"
@@ -60,6 +89,8 @@ const AddTraining = () => {
           onChange={handleChange}
           required
         />
+
+        {/* Duration Input */}
         <input
           name="duration"
           type="number"
@@ -68,6 +99,8 @@ const AddTraining = () => {
           onChange={handleChange}
           required
         />
+
+        {/* Customer Dropdown */}
         <select
           name="customer"
           value={formData.customer}
@@ -81,6 +114,8 @@ const AddTraining = () => {
             </option>
           ))}
         </select>
+
+        {/* Submit Button */}
         <button type="submit" style={{ padding: "10px" }}>
           Add Training
         </button>

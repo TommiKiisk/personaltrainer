@@ -1,61 +1,61 @@
 import React, { useState, useEffect } from "react";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   useEffect(() => {
-    fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers")
+    fetch(
+      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers"
+    )
       .then((response) => response.json())
       .then((data) => setCustomers(data._embedded.customers))
       .catch((err) => console.error(err));
   }, []);
 
-  // Utility function for sorting
-  const sortData = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
-    setSortConfig({ key, direction });
-
-    const sortedData = [...customers].sort((a, b) => {
-      if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
-      if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
-      return 0;
-    });
-    setCustomers(sortedData);
-  };
-
-  // Sorting indicator
-  const getSortIndicator = (key) => {
-    if (sortConfig.key !== key) return null;
-    return sortConfig.direction === "ascending" ? " ▲" : " ▼";
-  };
+  const columnDefs = [
+    {
+      headerName: "First Name",
+      field: "firstname",
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: "Last Name",
+      field: "lastname",
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: "City",
+      field: "city",
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: "Email",
+      field: "email",
+      sortable: true,
+      filter: true,
+    },
+  ];
 
   return (
-    <div>
+    <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
       <h1>Customer List</h1>
-      <table border="1">
-        <thead>
-          <tr>
-            <th onClick={() => sortData("firstname")}>First Name {getSortIndicator("firstname")}</th>
-            <th onClick={() => sortData("lastname")}>Last Name {getSortIndicator("lastname")}</th>
-            <th onClick={() => sortData("city")}>City {getSortIndicator("city")}</th>
-            <th onClick={() => sortData("email")}>Email {getSortIndicator("email")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((customer, index) => (
-            <tr key={index}>
-              <td>{customer.firstname}</td>
-              <td>{customer.lastname}</td>
-              <td>{customer.city}</td>
-              <td>{customer.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <AgGridReact
+        rowData={customers}
+        columnDefs={columnDefs}
+        pagination={true}
+        paginationPageSize={10}
+        defaultColDef={{
+          resizable: true,
+          sortable: true,
+          filter: true,
+        }}
+      />
     </div>
   );
 };
