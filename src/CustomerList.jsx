@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import ExportCustomers from "./ExportCustomers";
+
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
@@ -56,6 +58,8 @@ const CustomerList = () => {
           filter: true,
         }}
       />
+      <ExportCustomers customers={customers} />
+
     </div>
   );
 };
